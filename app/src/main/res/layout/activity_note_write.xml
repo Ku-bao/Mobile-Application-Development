@@ -33,5 +33,50 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+ >
+            <EditText
+                android:id="@+id/TitleEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:maxLength="21"
+                android:hint="@string/title"
+                android:textSize="27sp"
+                android:background="@null"
+                android:inputType="textMultiLine"/>
 
+            <TextView
+                android:id="@+id/textViewBelow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp" />
+
+            <EditText
+                android:id="@+id/ContentEditText"
+                android:layout_width="match_parent"
+                android:layout_height="1000dp"
+                android:gravity="top|start"
+                android:layout_marginTop="16sp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:textSize="20sp"
+                android:background="@null"
+                android:inputType="textMultiLine" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
