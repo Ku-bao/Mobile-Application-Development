@@ -1,20 +1,22 @@
 package com.example.securenotes;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.method.ScrollingMovementMethod;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -23,8 +25,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
+
 public class NoteWriteActivity extends AppCompatActivity {
     private Toast titleToast;
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,13 +41,10 @@ public class NoteWriteActivity extends AppCompatActivity {
         EditText titleeditText = findViewById(R.id.TitleEditText);
         int maxLengthTitle = 20;
 
-        EditText contentEditText = findViewById(R.id.ContentEditText);
-        contentEditText.requestFocus();
-
-
         String currentDateTime = new SimpleDateFormat("MMM dd, yyyy, hh:mm a", Locale.getDefault()).format(new Date());
         TextView dataTextView = findViewById(R.id.textViewBelow);
         dataTextView.setText(currentDateTime);
+
         titleeditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -69,6 +70,14 @@ public class NoteWriteActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EditText contentEditText = findViewById(R.id.ContentEditText);
+        contentEditText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(contentEditText, InputMethodManager.SHOW_FORCED);
     }
 
     @Override
