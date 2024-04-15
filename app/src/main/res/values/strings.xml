@@ -3,4 +3,9 @@
     <string name="Language">Language</string>
     <string name="Theme">Theme</string>
     <string name="title">Title</string>
+    <string-array name="spinner_data">
+        <item>All notes</item>
+        <item>My Favourites</item>
+    </string-array>
+
 </resources>

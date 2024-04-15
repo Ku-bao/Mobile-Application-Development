@@ -41,7 +41,7 @@ public class NoteWriteActivity extends AppCompatActivity {
         EditText titleeditText = findViewById(R.id.TitleEditText);
         int maxLengthTitle = 20;
 
-        String currentDateTime = new SimpleDateFormat("MMM dd, yyyy, hh:mm a", Locale.getDefault()).format(new Date());
+        String currentDateTime = new SimpleDateFormat("MMM dd, yyyy, h:mm a", Locale.US).format(new Date());
         TextView dataTextView = findViewById(R.id.textViewBelow);
         dataTextView.setText(currentDateTime);
 

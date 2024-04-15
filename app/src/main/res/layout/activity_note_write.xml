@@ -45,13 +45,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="0dp">
             <EditText
                 android:id="@+id/TitleEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="32dp"
                 android:layout_marginRight="32dp"
+                android:fontFamily="@font/roboto_mono_medium"
                 android:maxLength="21"
                 android:hint="@string/title"
                 android:textSize="27sp"
@@ -62,6 +63,7 @@
                 android:id="@+id/textViewBelow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_mono"
                 android:textSize="16sp"
                 android:layout_marginTop="16dp"
                 android:layout_marginStart="32dp"
@@ -69,6 +71,7 @@
 
             <EditText
                 android:id="@+id/ContentEditText"
+                android:fontFamily="@font/roboto_mono"
                 android:layout_width="match_parent"
                 android:layout_height="1000dp"
                 android:gravity="top|start"
