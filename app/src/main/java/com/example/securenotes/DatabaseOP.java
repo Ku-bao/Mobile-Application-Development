@@ -1,0 +1,87 @@
+package com.example.securenotes;
+
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DatabaseOP {
+    SQLiteOpenHelper dbHandler;
+    SQLiteDatabase db;
+
+    private static final String[] columns = {
+            NoteDatabase.ID,
+            NoteDatabase.TITLE,
+            NoteDatabase.CONTENT,
+            NoteDatabase.TIME,
+            NoteDatabase.MODE
+    };
+
+    public DatabaseOP(Context context) {
+        dbHandler = new NoteDatabase(context, "notes.db", null, 1);
+    }
+
+    public void open() {
+        db = dbHandler.getWritableDatabase();
+    }
+
+    public void close() {
+        dbHandler.close();
+    }
+
+    public Note addNote(Note note) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(NoteDatabase.TITLE, note.getTitle());
+        contentValues.put(NoteDatabase.CONTENT, note.getContent());
+        contentValues.put(NoteDatabase.TIME, note.getTime());
+        contentValues.put(NoteDatabase.MODE, note.getTag());
+        long insertId = db.insert(NoteDatabase.TABLE_NAME, null, contentValues);
+        note.setId(insertId);
+        return note;
+    }
+
+    public Note getNote(long id) {
+        @SuppressLint("Recycle") Cursor cursor = db.query(NoteDatabase.TABLE_NAME, columns, NoteDatabase.ID + "=?" ,new String[]{String.valueOf(id)}, null, null, null, null);
+        if (cursor != null) cursor.moveToFirst();
+        assert cursor != null;
+        return new Note(cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
+    }
+
+
+    @SuppressLint("Range")
+    public List<Note> getAllNotes(){
+        @SuppressLint("Recycle") Cursor cursor = db.query(NoteDatabase.TABLE_NAME, columns, null, null, null, null, null, null);
+
+        List<Note> notes = new ArrayList<>();
+        if(cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                Note note = new Note();
+                note.setId(cursor.getLong(cursor.getColumnIndex(NoteDatabase.ID)));
+                note.setTitle(cursor.getString(cursor.getColumnIndex(NoteDatabase.TITLE)));
+                note.setContent(cursor.getString(cursor.getColumnIndex(NoteDatabase.CONTENT)));
+                note.setTime(cursor.getString(cursor.getColumnIndex(NoteDatabase.TIME)));
+                note.setTag(cursor.getInt(cursor.getColumnIndex(NoteDatabase.MODE)));
+                notes.add(note);
+            }
+        }
+        return notes;
+    }
+
+    public int updateNote(Note note) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(NoteDatabase.TITLE, note.getContent());
+        contentValues.put(NoteDatabase.CONTENT, note.getContent());
+        contentValues.put(NoteDatabase.TIME , note.getTime());
+        contentValues.put(NoteDatabase.MODE, note.getTag());
+        return db.update(NoteDatabase.TABLE_NAME, contentValues, NoteDatabase.ID + "=?", new String[]{ String.valueOf(note.getId())});
+    }
+
+    public void removeNote(Note note){
+        db.delete(NoteDatabase.TABLE_NAME, NoteDatabase.ID + "=" + note.getId(), null);
+    }
+}

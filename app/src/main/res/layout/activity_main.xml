@@ -25,7 +25,7 @@
                 android:overlapAnchor="false"
                 android:spinnerMode="dropdown"
                 android:background="@null"
-                android:popupBackground="@drawable/shape_for_custom_spinner"
+                android:popupBackground="@drawable/spinner_shape"
                 style="@style/customTheme"
 
                 />
@@ -37,45 +37,46 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="65dp"
         android:fitsSystemWindows="false">
 
         <com.google.android.material.appbar.AppBarLayout
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             >
 
-            <SearchView
+            <androidx.appcompat.widget.SearchView
                 android:id="@+id/searchView"
                 style="@style/Widget.Material3.SearchView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:iconifiedByDefault="false"
                 android:queryHint="Search notes"
-                app:layout_scrollFlags="scroll|enterAlways|snapMargins" />
+                app:layout_scrollFlags="scroll|enterAlways|snapMargins"
+                app:iconifiedByDefault="false"
+                />
         </com.google.android.material.appbar.AppBarLayout>
 
 
         <androidx.core.widget.NestedScrollView
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <LinearLayout
+            <com.example.securenotes.NestedListView
+                android:id="@+id/lv"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="10dp"
+                >
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="1600dp">
-
-                </TextView>
-            </LinearLayout>
+            </com.example.securenotes.NestedListView>
 
 
         </androidx.core.widget.NestedScrollView>

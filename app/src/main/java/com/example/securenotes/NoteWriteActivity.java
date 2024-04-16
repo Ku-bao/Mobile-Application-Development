@@ -2,6 +2,7 @@ package com.example.securenotes;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,17 +36,18 @@ public class NoteWriteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_write);
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+
         EditText titleeditText = findViewById(R.id.TitleEditText);
         int maxLengthTitle = 20;
-
         String currentDateTime = new SimpleDateFormat("MMM dd, yyyy, h:mm a", Locale.US).format(new Date());
         TextView dataTextView = findViewById(R.id.textViewBelow);
         dataTextView.setText(currentDateTime);
-
+        EditText contenteditText = findViewById(R.id.ContentEditText);
         titleeditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -53,9 +56,9 @@ public class NoteWriteActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                if (count > 0 && s.length() >= maxLengthTitle) {
-//                    Toast.makeText(NoteWriteActivity.this, "You have entered too many characters", Toast.LENGTH_SHORT).show();
-//                }
+                if (count > 0 && s.length() >= maxLengthTitle) {
+                    Toast.makeText(NoteWriteActivity.this, "You have entered too many characters", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -68,6 +71,19 @@ public class NoteWriteActivity extends AppCompatActivity {
                     titleToast = Toast.makeText(NoteWriteActivity.this, "You have entered too many characters", Toast.LENGTH_SHORT);
                     titleToast.show();
                 }
+            }
+        });
+
+        ImageButton confirmButton = findViewById(R.id.confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra("title", titleeditText.getText().toString());
+                intent.putExtra("time", currentDateTime);
+                intent.putExtra("content", contenteditText.getText().toString());
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }
