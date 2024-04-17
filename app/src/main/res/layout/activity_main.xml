@@ -73,6 +73,8 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:divider="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true"
                 android:dividerHeight="10dp"
                 >
 

@@ -2,6 +2,7 @@ package com.example.securenotes;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -22,6 +24,7 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -30,12 +33,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     private List<Note> noteList;
     private ListView lv;
     private NoteAdapter noteadapter;
     private final Context context = this;
-    private ActivityResultLauncher<Intent> secondActivityResultLauncher;
+//    private ActivityResultLauncher<Intent> secondActivityResultLauncher;
     private DatabaseOP databaseOP;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,32 +61,15 @@ public class MainActivity extends AppCompatActivity {
         noteList = new ArrayList<>();
         noteadapter = new NoteAdapter(context, noteList);
         lv.setAdapter(noteadapter);
+        lv.setOnItemClickListener(this);
+        lv.setOnItemLongClickListener(this);
         refreshListView();
 
-
-        secondActivityResultLauncher = registerForActivityResult(
-        new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null) {
-                            String title = data.getStringExtra("title");
-                            String time = data.getStringExtra("time");
-                            String content = data.getStringExtra("content");
-                            Note note = new Note(title, content, time, 1);
-                            databaseOP = new DatabaseOP(context);
-                            databaseOP.open();
-                            databaseOP.addNote(note);
-                            databaseOP.close();
-                            refreshListView();
-                        }
-                    }
-                });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, NoteWriteActivity.class);
-                secondActivityResultLauncher.launch(intent);
+                startActivity(intent);
             }
         });
     }
@@ -91,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        refreshListView();
     }
 
     @Override
@@ -121,4 +108,48 @@ public class MainActivity extends AppCompatActivity {
         databaseOP.close();
         noteadapter.notifyDataSetChanged();
     }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (parent.getId() == lv.getId()) {
+            Note curNote = (Note) parent.getItemAtPosition(position);
+            Intent intent = new Intent(MainActivity.this, NoteWriteActivity.class);
+            intent.putExtra("id", curNote.getId());
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        showDeleteDialog(position);
+        return true;
+    }
+
+    private void showDeleteDialog(int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Delete");
+        builder.setMessage("Are you sure to delete this note?");
+
+        builder.setPositiveButton("delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Note noteToDelete = noteList.get(position);
+                databaseOP.open();
+                databaseOP.removeNote(noteToDelete);
+                databaseOP.close();
+                refreshListView();
+                Toast.makeText(MainActivity.this, "Note has been deleted.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog deleteDialog = builder.create();
+        deleteDialog.show();
+    }
+
 }

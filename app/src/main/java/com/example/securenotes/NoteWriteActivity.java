@@ -27,44 +27,48 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
-
 public class NoteWriteActivity extends AppCompatActivity {
     private Toast titleToast;
+    private EditText titleEditText;
+    private TextView dataTextView;
+    private EditText contentEditText;
+    private DatabaseOP databaseOP;
+    private String currentDateTime;
+    private Note lastNote;
+    private long noteId = -1;
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_write);
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        initToolbar();
+        initDatabase();
+        initView();
+        loadNote();
+    }
 
+    private void initToolbar() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+    }
 
+    private void initDatabase() {
+        databaseOP = new DatabaseOP(this);
+    }
 
-        EditText titleeditText = findViewById(R.id.TitleEditText);
+    private void initView() {
+        titleEditText = findViewById(R.id.TitleEditText);
         int maxLengthTitle = 20;
-        String currentDateTime = new SimpleDateFormat("MMM dd, yyyy, h:mm a", Locale.US).format(new Date());
-        TextView dataTextView = findViewById(R.id.textViewBelow);
-        dataTextView.setText(currentDateTime);
-        EditText contenteditText = findViewById(R.id.ContentEditText);
-        titleeditText.addTextChangedListener(new TextWatcher() {
+        titleEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count > 0 && s.length() >= maxLengthTitle) {
-                    Toast.makeText(NoteWriteActivity.this, "You have entered too many characters", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
                 if (s.length() > maxLengthTitle) {
-                    s.delete(maxLengthTitle, s.length());
                     if (titleToast != null) {
                         titleToast.cancel();
                     }
@@ -72,28 +76,65 @@ public class NoteWriteActivity extends AppCompatActivity {
                     titleToast.show();
                 }
             }
-        });
 
-        ImageButton confirmButton = findViewById(R.id.confirmButton);
-        confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.putExtra("title", titleeditText.getText().toString());
-                intent.putExtra("time", currentDateTime);
-                intent.putExtra("content", contenteditText.getText().toString());
-                setResult(RESULT_OK, intent);
-                finish();
+            public void afterTextChanged(Editable s) {
+                if (s.length() > maxLengthTitle) {
+                    s.delete(maxLengthTitle, s.length());
+                }
             }
         });
+
+        currentDateTime = new SimpleDateFormat("MMM dd, yyyy, h:mm a", Locale.US).format(new Date());
+        dataTextView = findViewById(R.id.textViewBelow);
+        dataTextView.setText(currentDateTime);
+
+        contentEditText = findViewById(R.id.ContentEditText);
+
+        ImageButton confirmButton = findViewById(R.id.confirmButton);
+        confirmButton.setOnClickListener(v -> {
+            saveNoteToDatabase();
+            finish();
+        });
     }
+
+    private void loadNote() {
+        noteId = getIntent().getLongExtra("id", -1);
+        if (noteId != -1) {
+            databaseOP.open();
+            lastNote = databaseOP.getNote(noteId);
+            if (lastNote != null) {
+                titleEditText.setText(lastNote.getTitle());
+                contentEditText.setText(lastNote.getContent());
+            }
+            databaseOP.close();
+        }
+    }
+
+    private void saveNoteToDatabase() {
+        String title = titleEditText.getText().toString();
+        String content = contentEditText.getText().toString();
+        databaseOP.open();
+        if (noteId != -1) {
+            lastNote.setId(noteId);
+            lastNote.setTitle(title);
+            lastNote.setTime(currentDateTime);
+            lastNote.setContent(content);
+            databaseOP.updateNote(lastNote);
+            Toast.makeText(this, "Note updated", Toast.LENGTH_SHORT).show();
+        } else {
+            Note note = new Note(title, content, currentDateTime, 1);
+            databaseOP.addNote(note);
+            Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
+        }
+        databaseOP.close();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        EditText contentEditText = findViewById(R.id.ContentEditText);
         contentEditText.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(contentEditText, InputMethodManager.SHOW_FORCED);
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(contentEditText, InputMethodManager.SHOW_FORCED);
     }
 
     @Override

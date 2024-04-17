@@ -46,10 +46,19 @@ public class DatabaseOP {
     }
 
     public Note getNote(long id) {
-        @SuppressLint("Recycle") Cursor cursor = db.query(NoteDatabase.TABLE_NAME, columns, NoteDatabase.ID + "=?" ,new String[]{String.valueOf(id)}, null, null, null, null);
-        if (cursor != null) cursor.moveToFirst();
-        assert cursor != null;
-        return new Note(cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
+        Cursor cursor = db.query(NoteDatabase.TABLE_NAME, columns, NoteDatabase.ID + "=?" , new String[]{String.valueOf(id)}, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            Note note = new Note(
+                    cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("content")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("time")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("mode"))
+            );
+            cursor.close();
+            return note;
+        } else {
+            return null;
+        }
     }
 
 
@@ -74,7 +83,7 @@ public class DatabaseOP {
 
     public int updateNote(Note note) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(NoteDatabase.TITLE, note.getContent());
+        contentValues.put(NoteDatabase.TITLE, note.getTitle());
         contentValues.put(NoteDatabase.CONTENT, note.getContent());
         contentValues.put(NoteDatabase.TIME , note.getTime());
         contentValues.put(NoteDatabase.MODE, note.getTag());
