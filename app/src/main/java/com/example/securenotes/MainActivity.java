@@ -4,7 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,6 +18,7 @@ import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -26,10 +32,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,31 +133,35 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return true;
     }
 
-    private void showDeleteDialog(int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("Delete");
-        builder.setMessage("Are you sure to delete this note?");
+    private void showDeleteDialog(int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_custom, null);
+        builder.setView(dialogView);
 
-        builder.setPositiveButton("delete", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Note noteToDelete = noteList.get(position);
-                databaseOP.open();
-                databaseOP.removeNote(noteToDelete);
-                databaseOP.close();
-                refreshListView();
-                Toast.makeText(MainActivity.this, "Note has been deleted.", Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        TextView tvTitle = dialogView.findViewById(R.id.tvTitle);
+        TextView tvMessage = dialogView.findViewById(R.id.tvMessage);
+        Button btnPositive = dialogView.findViewById(R.id.btnPositive);
+        Button btnNegative = dialogView.findViewById(R.id.btnNegative);
 
         AlertDialog deleteDialog = builder.create();
         deleteDialog.show();
-    }
+        // 设置按钮的点击事件
+        btnPositive.setOnClickListener(v -> {
+            Note noteToDelete = noteList.get(position);
+            databaseOP.open();
+            databaseOP.removeNote(noteToDelete);
+            databaseOP.close();
+            refreshListView();  // 刷新列表显示
+            deleteDialog.dismiss();
+            Toast.makeText(MainActivity.this, "note has been deleted", Toast.LENGTH_SHORT).show();
+        });
 
+        btnNegative.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteDialog.dismiss();
+            }
+        });
+
+    }
 }

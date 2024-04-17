@@ -5,6 +5,9 @@
     <string name="title">Title</string>
     <string name="content">Content</string>
     <string name="time">Time</string>
+    <string name="delete">Delete</string>
+    <string name="delete_sure">Are you sure to delete this note?</string>
+    <string name="cancel">Cancel</string>
     <string-array name="spinner_data">
         <item>All notes</item>
         <item>My Favourites</item>
