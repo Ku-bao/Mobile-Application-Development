@@ -1,5 +1,7 @@
 package com.example.securenotes;
 
+import static java.util.Locale.filter;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,6 +34,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -78,6 +81,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, NoteWriteActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        SearchView searchView = findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                noteadapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                noteadapter.getFilter().filter(newText);
+                return true;
             }
         });
     }
